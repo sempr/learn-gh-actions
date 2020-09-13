@@ -1,0 +1,46 @@
+name: Go
+
+# 在什么条件下触发
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+
+    # 在虚拟机上安装Golang环境
+    - name: Set up Go 1.x
+      uses: actions/setup-go@v2
+      with:
+        go-version: ^1.14
+      id: go
+
+    # 在虚拟机上拉取master分支代码
+    - name: Check out code into the Go module directory
+      uses: actions/checkout@v2
+
+    # 后端"构建"
+    - name: Build Backend
+      run: go run backend_static.go && mkdir -p ./public && mv ./api ./public/api
+
+    # 前端"构建"
+    - name: Build Frontend
+      run: mv ./frontend.html ./public/index.html && cp ./public/index.html ./public/404.html
+
+    # 将构建的内容发布到 Github Pages
+    - name: GitHub Pages action
+      uses: peaceiris/actions-gh-pages@v3.6.1
+      with:
+        # Set a generated GITHUB_TOKEN for pushing to the remote branch.
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        # Set Git user.name
+        user_name: Lewin Lan
+        # Set Git user.email
+        user_email: lewin.lan.cn@gmail.com
+  

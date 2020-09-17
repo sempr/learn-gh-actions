@@ -5,6 +5,7 @@ WORKDIR /backend
 
 RUN go build -o backend backend.go
 
+FROM busybox
+COPY --from=0 /backend/backend /app
 EXPOSE 80
-
-CMD /backend/backend
+CMD ["/app"]
